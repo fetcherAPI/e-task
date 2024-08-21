@@ -34,7 +34,7 @@ model Task {
 enum Status {
   CREATED
   IN_PROCCESS
-  SEND_TO_CONFRIM
+  SEND_TO_CONFIRM
   DONE
   ROLLED_BACK
 }
@@ -61,6 +61,7 @@ model User {
   password      String
   Responsible   Responsible? @relation(fields: [responsibleId], references: [id])
   responsibleId String?
+  active        Boolean      @default(false)
 
   @@map("user")
 }

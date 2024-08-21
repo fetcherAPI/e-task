@@ -1,7 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma.service';
+import { paginator, PaginatorTypes } from '@nodeteam/nestjs-prisma-pagination';
+import { Status } from '@prisma/client';
+
+interface IFindAll {
+  page?: number;
+  perPage?: number;
+}
+
+const paginate: PaginatorTypes.PaginateFunction = paginator({ perPage: 10 });
 
 @Injectable()
 export class TaskService {
@@ -12,18 +21,23 @@ export class TaskService {
     });
   }
 
-  async findAll() {
-    const tasks = await this.prisma.task.findMany({
-      include: {
-        responsible: true,
+  async findAll({ page, perPage }: IFindAll) {
+    return paginate(
+      this.prisma.task,
+      {
+        include: {
+          responsible: {
+            select: {
+              name: true,
+            },
+          },
+        },
       },
-    });
-
-    const respose = tasks.map((el) => {
-      return { ...el, responsible: el.responsible.name };
-    });
-
-    return respose;
+      {
+        page,
+        perPage,
+      },
+    );
   }
 
   findOne(id: number) {
@@ -36,5 +50,21 @@ export class TaskService {
 
   remove(id: number) {
     return `This action removes a #${id} task`;
+  }
+
+  async updateTaskStatus(id: string, status: Status) {
+    try {
+      const task = await this.prisma.task.update({
+        where: { id },
+        data: { status },
+      });
+
+      if (!task) {
+        throw new NotFoundException(`Task with ID ${id} not found`);
+      }
+      return task;
+    } catch (error) {
+      console.error(`Error updating task status to ${status}:`, error);
+    }
   }
 }
