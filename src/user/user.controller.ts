@@ -32,15 +32,16 @@ export class UserController {
     return user;
   }
 
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    const { password, ...user } = await this.userService.update(id, dto);
+    return user;
+  }
+
   @Get()
   findAll(@Paginate() paginateOptions: PaginateOptions) {
     const { page, perPage } = paginateOptions;
     return this.userService.findAll({ page, perPage });
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateUserDto) {
-    return this.userService.update(id, updateTaskDto);
   }
 
   @Patch('active/:id')

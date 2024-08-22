@@ -6,9 +6,10 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ResponsibleModule } from './responsible/responsible.module';
 import { TaskModule } from './task/task.module';
+import { TaskHistoryModule } from './task-history/task-history.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ResponsibleModule, TaskModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ResponsibleModule, TaskModule, TaskHistoryModule],
   controllers: [AppController],
   providers: [AppService],
 })

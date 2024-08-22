@@ -6,5 +6,5 @@ import { IsNotEmpty } from 'class-validator';
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsNotEmpty()
   @ApiProperty({ enum: Status })
-  status: Status;
+  status?: Status;
 }

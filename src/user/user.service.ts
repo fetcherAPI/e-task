@@ -29,10 +29,7 @@ export class UserService {
 
   async create(dto: CreateUserDto) {
     const user = {
-      fullName: dto.fullName,
-      login: dto.login,
-      roleId: dto.roleId,
-      responsibleId: dto.responsibleId,
+      ...dto,
       password: await hash(dto.password),
     };
 
@@ -41,10 +38,10 @@ export class UserService {
     });
   }
 
-  update(id: string, dto: UpdateUserDto) {
+  async update(id: string, dto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id },
-      data: dto,
+      data: dto.password ? { password: await hash(dto.password) } : dto,
     });
   }
 
@@ -72,6 +69,8 @@ export class UserService {
           active: true,
           password: false,
           responsibleId: true,
+          createdAt: true,
+          updatedAt: true,
         },
       },
       {

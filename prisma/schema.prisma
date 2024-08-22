@@ -14,18 +14,19 @@ datasource db {
 }
 
 model Task {
-  id            String      @id @default(cuid())
-  incomingDate  DateTime    @map("incoming_date")
-  createdDate   DateTime    @default(now()) @map("created_date")
-  updatedDate   DateTime    @updatedAt @map("updated_date")
-  taskNumber    String      @map("task_number")
-  taskText      String      @map("task_text")
-  responsible   Responsible @relation(fields: [responsibleId], references: [id])
-  responsibleId String      @map("responsible_id")
+  id            String        @id @default(cuid())
+  incomingDate  DateTime      @map("incoming_date")
+  createdDate   DateTime      @default(now()) @map("created_date")
+  updatedDate   DateTime      @updatedAt @map("updated_date")
+  taskNumber    String        @map("task_number")
+  taskText      String        @map("task_text")
+  responsible   Responsible   @relation(fields: [responsibleId], references: [id])
+  responsibleId String        @map("responsible_id")
   deadline      DateTime
-  endDate       DateTime?   @map("end_date")
-  status        Status      @default(CREATED)
+  endDate       DateTime?     @map("end_date")
+  status        Status        @default(CREATED)
   note          String?
+  TaskHistory   TaskHistory[]
 
   @@map("task")
 }
@@ -72,4 +73,18 @@ model Role {
   users User[]
 
   @@map("role")
+}
+
+model TaskHistory {
+  id        String   @id @default(cuid())
+  taskId    String
+  oldStatus Status
+  newStatus Status
+  changedAt DateTime @default(now())
+  changedBy String
+  task      Task     @relation(fields: [taskId], references: [id])
+  details   String?
+
+  @@index([taskId])
+  @@map("task_history")
 }
