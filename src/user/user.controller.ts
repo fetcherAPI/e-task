@@ -8,12 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateOptions } from 'src/shared/decorators/paginate.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -34,6 +36,11 @@ export class UserController {
   findAll(@Paginate() paginateOptions: PaginateOptions) {
     const { page, perPage } = paginateOptions;
     return this.userService.findAll({ page, perPage });
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateTaskDto: UpdateUserDto) {
+    return this.userService.update(id, updateTaskDto);
   }
 
   @Patch('active/:id')
