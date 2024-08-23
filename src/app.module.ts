@@ -7,9 +7,18 @@ import { UserModule } from './user/user.module';
 import { ResponsibleModule } from './responsible/responsible.module';
 import { TaskModule } from './task/task.module';
 import { TaskHistoryModule } from './task-history/task-history.module';
+import { TaskNoteModule } from './task-note/task-note.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ResponsibleModule, TaskModule, TaskHistoryModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UserModule,
+    ResponsibleModule,
+    TaskModule,
+    TaskHistoryModule,
+    TaskNoteModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

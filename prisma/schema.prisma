@@ -25,8 +25,8 @@ model Task {
   deadline      DateTime
   endDate       DateTime?     @map("end_date")
   status        Status        @default(CREATED)
-  note          String?
   TaskHistory   TaskHistory[]
+  TaskNotes     TaskNotes[]
 
   @@map("task")
 }
@@ -87,4 +87,17 @@ model TaskHistory {
 
   @@index([taskId])
   @@map("task_history")
+}
+
+model TaskNotes {
+  id          String   @id @default(cuid())
+  taskId      String
+  createdDate DateTime @default(now()) @map("created_date")
+  noteBy      String
+  fullName    String
+  task        Task     @relation(fields: [taskId], references: [id])
+  note        String
+
+  @@index([taskId])
+  @@map("task_notes")
 }

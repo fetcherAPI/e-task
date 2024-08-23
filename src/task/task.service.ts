@@ -19,6 +19,7 @@ interface IFindAll {
   perPage?: number;
   taskNumber?: string;
   taskText?: string;
+  responsibleId?: string;
 }
 
 const paginate: PaginatorTypes.PaginateFunction = paginator({ perPage: 10 });
@@ -30,22 +31,19 @@ export class TaskService {
     private taskHistoryService: TaskHistoryService,
   ) {}
 
-  private async getPrevStatus(taskId: string) {
-    return (await this.prisma.task.findUnique({ where: { id: taskId } }))?.status;
-  }
-
   async create(dto: CreateTaskDto) {
     return await this.prisma.task.create({
       data: dto,
     });
   }
 
-  async findAll({ page, perPage, taskNumber, taskText }: IFindAll) {
+  async findAll({ page, perPage, taskNumber, taskText, responsibleId }: IFindAll) {
     return paginate(
       this.prisma.task,
       {
         where: {
           AND: [
+            responsibleId ? { responsibleId } : {},
             taskNumber ? { taskNumber: { contains: taskNumber } } : {},
             taskText ? { taskText: { contains: taskText } } : {},
           ],
@@ -56,6 +54,7 @@ export class TaskService {
               name: true,
             },
           },
+          TaskNotes: true,
         },
       },
       {
@@ -96,11 +95,15 @@ export class TaskService {
     return `This action removes a #${id} task`;
   }
 
-  async updateTaskStatus(id: string, status: Status, changedBy?: string) {
+  async updateTaskStatus(id: string, status: Status, changedBy: string) {
     try {
+      const prevStatus = (await this.prisma.task.findUnique({ where: { id } }))?.status;
       const task = await this.prisma.task.update({
         where: { id },
         data: { status },
+        include: {
+          TaskNotes: true,
+        },
       });
 
       if (!task) {
@@ -111,7 +114,7 @@ export class TaskService {
         taskId: id,
         changedAt: new Date(),
         changedBy: changedBy || '',
-        oldStatus: await this.getPrevStatus(id),
+        oldStatus: prevStatus,
         newStatus: status,
       });
 

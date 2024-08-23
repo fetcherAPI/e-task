@@ -23,7 +23,7 @@ export class AuthService {
 
   async login(dto: AuthDto) {
     const { password, ...user } = await this.validateUser(dto);
-    const tokens = this.issueTokens(user.id);
+    const tokens = this.issueTokens(user.id, user.roleId, user?.responsibleId);
     return {
       user,
       ...tokens,
@@ -37,7 +37,7 @@ export class AuthService {
 
     const { password, ...user } = await this.userService.create(dto);
 
-    const tokens = this.issueTokens(user.id);
+    const tokens = this.issueTokens(user.id, user.roleId, user?.responsibleId);
 
     return {
       user,
@@ -45,8 +45,8 @@ export class AuthService {
     };
   }
 
-  private issueTokens(userId: string) {
-    const data = { id: userId };
+  private issueTokens(userId: string, roleId: number, responsibleId: string) {
+    const data = { id: userId, roleId };
 
     const accessToken = this.jwt.sign(data, {
       expiresIn: '1h',
@@ -60,8 +60,9 @@ export class AuthService {
   }
 
   private async validateUser(dto: AuthDto) {
+    console.log('dto', dto);
     const user = await this.userService.getByLogin(dto.login);
-
+    console.log('user ', user);
     if (!user) throw new NotFoundException('user not found');
 
     const isValid = await verify(user.password, dto.password);
@@ -107,7 +108,7 @@ export class AuthService {
 
       const { password, ...user } = await this.userService.getById(result.id);
 
-      const tokens = this.issueTokens(user.id);
+      const tokens = this.issueTokens(user.id, user.roleId, user?.responsibleId);
       return {
         user,
         ...tokens,
