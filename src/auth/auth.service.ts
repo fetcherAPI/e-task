@@ -1,6 +1,7 @@
 import { CreateUserDto } from './../user/dto/create-user.dto';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -22,7 +23,10 @@ export class AuthService {
   ) {}
 
   async login(dto: AuthDto) {
-    const { password, ...user } = await this.validateUser(dto);
+    const { password, Responsible, ...user } = await this.validateUser(dto);
+
+    if (!user.active) throw new ForbiddenException('user is not activated');
+
     const tokens = this.issueTokens(user.id, user.roleId, user?.responsibleId);
     return {
       user,
@@ -60,21 +64,19 @@ export class AuthService {
   }
 
   private async validateUser(dto: AuthDto) {
-    console.log('dto', dto);
     const user = await this.userService.getByLogin(dto.login);
-    console.log('user ', user);
+
     if (!user) throw new NotFoundException('user not found');
 
     const isValid = await verify(user.password, dto.password);
 
     if (!isValid) throw new UnauthorizedException('invalid password');
 
-    return user;
+    return { ...user, responsibleName: user?.Responsible?.name };
   }
 
   addRefreshTokenToResponse(res: Response, refreshToken: string) {
     const expiresIn = new Date();
-    console.log('refreshToken', refreshToken);
 
     expiresIn.setDate(expiresIn.getDate() + this.EXPIRE_DAY_REFRESH_TOKEN);
 
@@ -104,13 +106,24 @@ export class AuthService {
   async refreshTokens(refreshToken: string) {
     try {
       const result = await this.jwt.verifyAsync(refreshToken);
+
       if (!result) throw new UnauthorizedException('Invalid refresh token');
 
-      const { password, ...user } = await this.userService.getById(result.id);
+      const { password, ...userResponse } = await this.userService.getById(
+        result.id,
+      );
 
-      const tokens = this.issueTokens(user.id, user.roleId, user?.responsibleId);
+      const tokens = this.issueTokens(
+        userResponse.id,
+        userResponse.roleId,
+        userResponse?.responsibleId,
+      );
+      const { Responsible, ...user } = userResponse;
       return {
-        user,
+        user: {
+          ...user,
+          responsibleName: Responsible?.name,
+        },
         ...tokens,
       };
     } catch (err) {

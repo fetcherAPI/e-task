@@ -4,7 +4,7 @@ import { ResponsibleController } from './responsible.controller';
 import { PrismaService } from 'src/prisma.service';
 
 @Module({
-  controllers: [ResponsibleController],
-  providers: [ResponsibleService, PrismaService],
+    controllers: [ResponsibleController],
+    providers: [ResponsibleService, PrismaService],
 })
 export class ResponsibleModule {}

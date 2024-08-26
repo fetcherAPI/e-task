@@ -76,14 +76,15 @@ model Role {
 }
 
 model TaskHistory {
-  id        String   @id @default(cuid())
-  taskId    String
-  oldStatus Status
-  newStatus Status
-  changedAt DateTime @default(now())
-  changedBy String
-  task      Task     @relation(fields: [taskId], references: [id])
-  details   String?
+  id                String   @id @default(cuid())
+  taskId            String
+  oldStatus         Status
+  newStatus         Status
+  changedAt         DateTime @default(now())
+  changedBy         String
+  changedByFullName String
+  task              Task     @relation(fields: [taskId], references: [id])
+  details           String?
 
   @@index([taskId])
   @@map("task_history")

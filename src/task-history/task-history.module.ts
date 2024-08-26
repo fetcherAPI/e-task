@@ -4,8 +4,8 @@ import { TaskHistoryService } from './task-history.service';
 import { TaskHistoryController } from './task-history.controller';
 
 @Module({
-  controllers: [TaskHistoryController],
-  providers: [TaskHistoryService, PrismaService],
-  exports: [TaskHistoryService],
+    controllers: [TaskHistoryController],
+    providers: [TaskHistoryService, PrismaService],
+    exports: [TaskHistoryService],
 })
 export class TaskHistoryModule {}

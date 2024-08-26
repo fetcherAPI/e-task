@@ -6,29 +6,29 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class TaskHistoryService {
-  constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateTaskHistoryDto) {
-    return await this.prisma.taskHistory.create({
-      data: dto,
-    });
-  }
+    async create(dto: CreateTaskHistoryDto) {
+        return await this.prisma.taskHistory.create({
+            data: dto,
+        });
+    }
 
-  findAll() {
-    return `This action returns all taskHistory`;
-  }
-  findMany(taskId: string) {
-    return this.prisma.taskHistory.findMany({ where: { taskId } });
-  }
-  findOne(id: number) {
-    return `This action returns a #${id} taskHistory`;
-  }
+    findAll() {
+        return `This action returns all taskHistory`;
+    }
+    findMany(taskId: string) {
+        return this.prisma.taskHistory.findMany({ where: { taskId } });
+    }
+    findOne(id: number) {
+        return `This action returns a #${id} taskHistory`;
+    }
 
-  update(id: number, updateTaskHistoryDto: UpdateTaskHistoryDto) {
-    return `This action updates a #${id} taskHistory`;
-  }
+    update(id: number, updateTaskHistoryDto: UpdateTaskHistoryDto) {
+        return `This action updates a #${id} taskHistory`;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} taskHistory`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} taskHistory`;
+    }
 }
