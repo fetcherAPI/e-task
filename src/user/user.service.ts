@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { hash } from 'argon2';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginatorTypes, paginator } from '@nodeteam/nestjs-prisma-pagination';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RoleEnum } from 'src/enums/role.enum';
 
 const paginate: PaginatorTypes.PaginateFunction = paginator({ perPage: 200 });
 @Injectable()
@@ -25,6 +26,14 @@ export class UserService {
         });
     }
 
+    getRole(id: number) {
+        return this.prisma.user.findMany({
+            where: {
+                roleId: id,
+            },
+        });
+    }
+
     getByLogin(login: string) {
         return this.prisma.user.findUnique({
             where: {
@@ -41,6 +50,10 @@ export class UserService {
     }
 
     async create(dto: CreateUserDto) {
+        const superUsers = await this.getRole(RoleEnum.SuperUser);
+
+        if (superUsers?.length) throw new ForbiddenException('Super user already existed');
+
         const user = {
             ...dto,
             password: await hash(dto.password),

@@ -5,100 +5,103 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Task {
-  id            String        @id @default(cuid())
-  incomingDate  DateTime      @map("incoming_date")
-  createdDate   DateTime      @default(now()) @map("created_date")
-  updatedDate   DateTime      @updatedAt @map("updated_date")
-  taskNumber    String        @map("task_number")
-  taskText      String        @map("task_text")
-  responsible   Responsible   @relation(fields: [responsibleId], references: [id])
-  responsibleId String        @map("responsible_id")
-  deadline      DateTime
-  endDate       DateTime?     @map("end_date")
-  status        Status        @default(CREATED)
-  TaskHistory   TaskHistory[]
-  TaskNotes     TaskNotes[]
+    id            String        @id @default(cuid())
+    incomingDate  DateTime      @map("incoming_date")
+    createdDate   DateTime      @default(now()) @map("created_date")
+    updatedDate   DateTime      @updatedAt @map("updated_date")
+    taskNumber    String        @map("task_number")
+    taskText      String        @map("task_text")
+    responsible   Responsible   @relation(fields: [responsibleId], references: [id])
+    responsibleId String        @map("responsible_id")
+    deadline      DateTime
+    endDate       DateTime?     @map("end_date")
+    status        Status        @default(CREATED)
+    TaskHistory   TaskHistory[]
+    TaskNotes     TaskNotes[]
+    user          User          @relation(fields: [userId], references: [id])
+    userId        String
 
-  @@map("task")
+    @@map("task")
 }
 
 //taskStatuses
 enum Status {
-  CREATED
-  IN_PROCCESS
-  SEND_TO_CONFIRM
-  DONE
-  ROLLED_BACK
+    CREATED
+    IN_PROCCESS
+    SEND_TO_CONFIRM
+    DONE
+    ROLLED_BACK
 }
 
 model Responsible {
-  id          String   @id @default(cuid())
-  createdDate DateTime @default(now()) @map("created_date")
-  updatedDate DateTime @updatedAt @map("updated_date")
-  name        String   @unique
-  tasks       Task[]
-  users       User[]
+    id          String   @id @default(cuid())
+    createdDate DateTime @default(now()) @map("created_date")
+    updatedDate DateTime @updatedAt @map("updated_date")
+    name        String   @unique
+    tasks       Task[]
+    users       User[]
 
-  @@map("responsible")
+    @@map("responsible")
 }
 
 model User {
-  id            String       @id @default(cuid())
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-  role          Role         @relation(fields: [roleId], references: [id])
-  roleId        Int          @map("role_id")
-  login         String       @unique
-  fullName      String       @map("full_name")
-  password      String
-  Responsible   Responsible? @relation(fields: [responsibleId], references: [id])
-  responsibleId String?
-  active        Boolean      @default(false)
+    id            String       @id @default(cuid())
+    createdAt     DateTime     @default(now()) @map("created_at")
+    updatedAt     DateTime     @updatedAt @map("updated_at")
+    role          Role         @relation(fields: [roleId], references: [id])
+    roleId        Int          @map("role_id")
+    login         String       @unique
+    fullName      String       @map("full_name")
+    password      String
+    Responsible   Responsible? @relation(fields: [responsibleId], references: [id])
+    responsibleId String?
+    tasks         Task[]
+    active        Boolean      @default(false)
 
-  @@map("user")
+    @@map("user")
 }
 
 model Role {
-  id    Int    @unique
-  name  String @unique
-  users User[]
+    id    Int    @unique
+    name  String @unique
+    users User[]
 
-  @@map("role")
+    @@map("role")
 }
 
 model TaskHistory {
-  id                String   @id @default(cuid())
-  taskId            String
-  oldStatus         Status
-  newStatus         Status
-  changedAt         DateTime @default(now())
-  changedBy         String
-  changedByFullName String
-  task              Task     @relation(fields: [taskId], references: [id])
-  details           String?
+    id                String   @id @default(cuid())
+    taskId            String
+    oldStatus         Status
+    newStatus         Status
+    changedAt         DateTime @default(now())
+    changedBy         String
+    changedByFullName String
+    task              Task     @relation(fields: [taskId], references: [id])
+    details           String?
 
-  @@index([taskId])
-  @@map("task_history")
+    @@index([taskId])
+    @@map("task_history")
 }
 
 model TaskNotes {
-  id          String   @id @default(cuid())
-  taskId      String
-  createdDate DateTime @default(now()) @map("created_date")
-  noteBy      String
-  fullName    String
-  task        Task     @relation(fields: [taskId], references: [id])
-  note        String
+    id          String   @id @default(cuid())
+    taskId      String
+    createdDate DateTime @default(now()) @map("created_date")
+    noteBy      String
+    fullName    String
+    task        Task     @relation(fields: [taskId], references: [id])
+    note        String
 
-  @@index([taskId])
-  @@map("task_notes")
+    @@index([taskId])
+    @@map("task_notes")
 }

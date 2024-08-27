@@ -32,9 +32,9 @@ export class TaskService {
         private taskHistoryService: TaskHistoryService,
     ) {}
 
-    async create(dto: CreateTaskDto) {
+    async create(dto: CreateTaskDto, userId: string) {
         return await this.prisma.task.create({
-            data: dto,
+            data: { ...dto, userId },
         });
     }
 
@@ -53,6 +53,12 @@ export class TaskService {
                     responsible: {
                         select: {
                             name: true,
+                        },
+                    },
+                    user: {
+                        select: {
+                            fullName: true,
+                            login: true,
                         },
                     },
                     TaskNotes: true,

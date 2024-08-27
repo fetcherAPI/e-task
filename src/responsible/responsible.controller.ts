@@ -1,15 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    UsePipes,
-    ValidationPipe,
-    UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { ResponsibleService } from './responsible.service';
 import { CreateResponsibleDto } from './dto/create-responsible.dto';
 import { UpdateResponsibleDto } from './dto/update-responsible.dto';
@@ -18,6 +7,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { RoleEnum } from 'src/enums/role.enum';
 
 @ApiTags('responsilblity')
 @Controller('responsible')
@@ -35,7 +25,7 @@ export class ResponsibleController {
     @Auth()
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(1, 2)
+    @Roles(RoleEnum.Admin, RoleEnum.Creator, RoleEnum.SuperUser)
     @Get()
     findAll() {
         return this.responsibleService.findAll();
@@ -47,10 +37,7 @@ export class ResponsibleController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateResponsibleDto: UpdateResponsibleDto,
-    ) {
+    update(@Param('id') id: string, @Body() updateResponsibleDto: UpdateResponsibleDto) {
         return this.responsibleService.update(+id, updateResponsibleDto);
     }
 
